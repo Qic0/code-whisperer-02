@@ -68,10 +68,24 @@ export const WorkerDetailsDialog = ({ worker, open, onOpenChange }: WorkerDetail
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
-  const { isUserOnline, getUserStatus } = useAuth();
   const { toast } = useToast();
   
   if (!worker) return null;
+
+  // Проверка онлайн статуса на основе last_seen
+  const isWorkerOnline = () => {
+    if (!worker.last_seen) return false;
+    
+    const lastSeen = new Date(worker.last_seen).getTime();
+    const now = new Date().getTime();
+    const diffInMinutes = (now - lastSeen) / (1000 * 60);
+    
+    return diffInMinutes <= 1;
+  };
+
+  const getWorkerStatus = (): 'online' | 'offline' => {
+    return isWorkerOnline() ? 'online' : 'offline';
+  };
 
   const formatExecutionTime = (seconds?: number) => {
     if (!seconds) return null;
@@ -307,7 +321,7 @@ export const WorkerDetailsDialog = ({ worker, open, onOpenChange }: WorkerDetail
                       </Avatar>
                       {/* Онлайн индикатор */}
                       <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full border-2 border-white ${
-                        isUserOnline(worker.uuid_user) 
+                        isWorkerOnline() 
                           ? 'bg-green-500' 
                           : 'bg-gray-400'
                       }`} />
@@ -319,11 +333,11 @@ export const WorkerDetailsDialog = ({ worker, open, onOpenChange }: WorkerDetail
                           {roleConfig.label}
                         </Badge>
                         <Badge className={`${
-                          getUserStatus(worker.uuid_user) === 'online' 
+                          getWorkerStatus() === 'online' 
                             ? 'bg-green-500/10 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800'
                             : 'bg-gray-500/10 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-800'
                         }`}>
-                          {getUserStatus(worker.uuid_user) === 'online' ? 'Онлайн' : 'Офлайн'}
+                          {getWorkerStatus() === 'online' ? 'Онлайн' : 'Офлайн'}
                         </Badge>
                       </div>
                     </div>
