@@ -379,10 +379,15 @@ export const WorkerDetailsDialog = ({ worker, open, onOpenChange }: WorkerDetail
                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">Последний онлайн:</span>
                 <span>
-                  {worker.last_online ? 
-                    format(new Date(worker.last_online), 'dd MMMM yyyy, HH:mm', { locale: ru }) : 
-                    'Никогда не был онлайн'
-                  }
+                  {worker.last_online ? (() => {
+                    // Парсим ISO строку напрямую без timezone преобразования
+                    const match = worker.last_online.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+                    if (!match) return worker.last_online;
+                    const [, year, month, day, hour, minute] = match;
+                    const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
+                                    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+                    return `${day} ${months[parseInt(month) - 1]} ${year}, ${hour}:${minute}`;
+                  })() : 'Никогда не был онлайн'}
                 </span>
               </div>
             </CardContent>
