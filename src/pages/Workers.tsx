@@ -32,15 +32,8 @@ const Workers = () => {
       // For each user with completed_tasks, fetch task and order details
       const enrichedUsers = await Promise.all(
         users.map(async (user) => {
-          // Get last online information
-          const { data: lastOnline } = await supabase
-            .rpc('get_user_last_sign_in', { user_uuid: user.uuid_user });
-
           if (!user.completed_tasks || user.completed_tasks.length === 0) {
-            return {
-              ...user,
-              last_online: lastOnline
-            };
+            return user;
           }
 
           // Get task IDs from completed_tasks
@@ -78,8 +71,7 @@ const Workers = () => {
 
           return {
             ...user,
-            completed_tasks: enrichedCompletedTasks,
-            last_online: lastOnline
+            completed_tasks: enrichedCompletedTasks
           };
         })
       );

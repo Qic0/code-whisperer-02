@@ -45,7 +45,7 @@ interface Worker {
   salary?: number;
   avatar_url?: string;
   created_at: string;
-  last_online?: string;
+  last_seen?: string;
   current_task?: string;
   completed_tasks?: Array<{
     task_id: number;
@@ -377,17 +377,17 @@ export const WorkerDetailsDialog = ({ worker, open, onOpenChange }: WorkerDetail
               
               <div className="flex items-center gap-3">
                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Последний онлайн:</span>
+                <span className="font-medium">Последняя активность:</span>
                 <span>
-                  {worker.last_online ? (() => {
+                  {worker.last_seen ? (() => {
                     // Парсим ISO строку напрямую без timezone преобразования
-                    const match = worker.last_online.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-                    if (!match) return worker.last_online;
+                    const match = worker.last_seen.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+                    if (!match) return worker.last_seen;
                     const [, year, month, day, hour, minute] = match;
                     const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
                                     'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
                     return `${day} ${months[parseInt(month) - 1]} ${year}, ${hour}:${minute}`;
-                  })() : 'Никогда не был онлайн'}
+                  })() : 'Нет данных'}
                 </span>
               </div>
             </CardContent>
